@@ -1,0 +1,59 @@
+Arguments: 
+  /home/ubuntu/.nvm/versions/node/v12.22.1/bin/node /home/ubuntu/.nvm/versions/node/v12.22.1/bin/yarn
+
+PATH: 
+  /home/ubuntu/.nvm/versions/node/v12.22.1/bin:/home/ubuntu/.vscode-server/bin/cfa2e218100323074ac1948c885448fdf4de2a7f/bin:/home/ubuntu/.vscode-server/bin/cfa2e218100323074ac1948c885448fdf4de2a7f/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+
+Yarn version: 
+  1.22.10
+
+Node version: 
+  12.22.1
+
+Platform: 
+  linux x64
+
+Trace: 
+  SyntaxError: /home/ubuntu/farmhero-core/package.json: Unexpected token } in JSON at position 148
+      at JSON.parse (<anonymous>)
+      at /home/ubuntu/.nvm/versions/node/v12.22.1/lib/node_modules/yarn/lib/cli.js:1625:59
+      at Generator.next (<anonymous>)
+      at step (/home/ubuntu/.nvm/versions/node/v12.22.1/lib/node_modules/yarn/lib/cli.js:310:30)
+      at /home/ubuntu/.nvm/versions/node/v12.22.1/lib/node_modules/yarn/lib/cli.js:321:13
+
+npm manifest: 
+  {
+    "name": "farmhero-core",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "scripts": {
+      "compile": "npx hardhat compile",
+    },
+    "devDependencies": {
+      "@nomiclabs/hardhat-ethers": "^2.0.2",
+      "@nomiclabs/hardhat-waffle": "^2.0.1",
+      "@openzeppelin/hardhat-upgrades": "^1.7.0",
+      "@openzeppelin/truffle-upgrades": "^1.6.1",
+      "@uniswap/lib": "^4.0.1-alpha",
+      "@uniswap/v2-core": "^1.0.1",
+      "chai": "^4.3.4",
+      "ethereum-waffle": "^3.3.0",
+      "ethers": "^5.1.4",
+      "hardhat": "^2.2.1"
+    },
+    "dependencies": {
+      "@nomiclabs/hardhat-etherscan": "^2.1.2",
+      "@nomiclabs/hardhat-web3": "^2.0.0",
+      "@openzeppelin/contracts": "3.4.0",
+      "@openzeppelin/contracts-upgradeable": "3.4.0",
+      "@openzeppelin/test-helpers": "^0.5.11",
+      "dotenv": "^9.0.0"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

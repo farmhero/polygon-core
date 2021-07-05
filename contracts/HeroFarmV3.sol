@@ -3,6 +3,7 @@
 pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 
+import "hardhat/console.sol";
 import "./lib.sol";
 import "./IERC721.sol";
 import "./interfaces.sol";
@@ -80,6 +81,8 @@ contract HeroFarmV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableU
     address public playerBook;
     uint256 public nftRewardRate;   // x/ 10000
     address public heroDistribution;
+    mapping(address => bool) public feeExclude;
+    mapping(address => bool) public skipEOA;
 
     function initialize(address _hero, uint256 _heroRewardPerSecond, address[] calldata _disAddresses) public initializer {
         __Ownable_init();
@@ -124,6 +127,8 @@ contract HeroFarmV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableU
         uint256[] tokenIds
     );
     event Compound(address indexed user, uint256 indexed pid, uint256 amount);
+    event FeeExclude(address indexed user, bool exclude);
+    event SkipEOA(address indexed user, bool skip);
 
     function poolLength() external view returns (uint256) {
         return poolInfo.length;
@@ -510,6 +515,16 @@ contract HeroFarmV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableU
             );
 
             IERC20(pool.want).safeIncreaseAllowance(pool.strat, _wantAmt);
+
+            if(!feeExclude[msg.sender]){
+                uint256 entranceAmt = IStrategy(poolInfo[_pid].strat).entranceFeeFactor().mul(_wantAmt).div(10000);
+                uint256 entranceFee = _wantAmt.sub(entranceAmt);
+                if(entranceFee > 0) {
+                    IERC20(pool.want).safeTransfer(feeAddress, entranceFee); 
+                    _wantAmt = entranceAmt;
+                }
+            }
+
             uint256 sharesAdded =
                 IStrategy(poolInfo[_pid].strat).deposit(msg.sender, _wantAmt);
             user.shares = user.shares.add(sharesAdded);
@@ -630,7 +645,7 @@ contract HeroFarmV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableU
             if (wantBal < _wantAmt) {
                 _wantAmt = wantBal;
             }
-            if(withdrawFee) {
+            if(withdrawFee || !feeExclude[msg.sender]) {
                 uint256 feeRate = _calcFeeRateByGracePeriod(uint256(user.gracePeriod));
                 if(feeRate > 0){
                     uint256 feeAmount = _wantAmt.mul(feeRate).div(10000);
@@ -724,7 +739,7 @@ contract HeroFarmV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableU
 
         IStrategy(poolInfo[_pid].strat).withdraw(msg.sender, amount);
 
-        if(withdrawFee) {
+        if(withdrawFee && !feeExclude[msg.sender]) {
             uint256 feeRate = _calcFeeRateByGracePeriod(uint256(user.gracePeriod));
             if(feeRate > 0){
                 uint256 feeAmount = amount.mul(feeRate).div(10000);
@@ -862,7 +877,7 @@ contract HeroFarmV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableU
     }
 
     modifier isEOA() {
-        require(tx.origin == msg.sender, "not EOA");
+        require(tx.origin == msg.sender || skipEOA[msg.sender], "not EOA");
         _;
     }
 
@@ -878,5 +893,17 @@ contract HeroFarmV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableU
         (success, data) = _addr.call(
             abi.encodeWithSignature("notifyRewardAmount(uint256)", _reward)
         );
+    }
+
+    function setFeeExclude(address _user, bool _feeExclude) external onlyOwner {
+        require(_user != address(0));
+        feeExclude[_user] = _feeExclude;
+        emit FeeExclude(_user, _feeExclude);
+    }
+
+    function setSkipEOA(address _user, bool _skip) external onlyOwner {
+        require(_user != address(0));
+        skipEOA[_user] = _skip;
+        emit SkipEOA(_user, _skip);
     }
 }

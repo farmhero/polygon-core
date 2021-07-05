@@ -35,6 +35,7 @@ interface IStrategy {
         uint256 _amount,
         address _to
     ) external;
+    function entranceFeeFactor() external returns (uint256);
 }
 
 interface IRewardDistribution {

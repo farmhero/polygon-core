@@ -2278,15 +2278,9 @@ abstract contract StratX2QuickV2 is OwnableUpgradeable, ReentrancyGuardUpgradeab
             _wantAmt
         );
 
-        uint256 entranceAmt = _wantAmt.mul(entranceFeeFactor).div(entranceFeeFactorMax);
-        uint256 entranceFee = _wantAmt.sub(entranceAmt);
-        if(entranceFee > 0) {
-           IERC20(wantAddress).safeTransfer(devAddress, entranceFee); 
-        }
-
-        uint256 sharesAdded = entranceAmt;
+        uint256 sharesAdded = _wantAmt;
         if (wantLockedTotal > 0 && sharesTotal > 0) {
-            sharesAdded = entranceAmt
+            sharesAdded = _wantAmt
                 .mul(sharesTotal)
                 .div(wantLockedTotal);
         }
@@ -2298,7 +2292,7 @@ abstract contract StratX2QuickV2 is OwnableUpgradeable, ReentrancyGuardUpgradeab
                 IRewardDistribution(rewardDistribution).earn(address(this));
             }
         } else {
-            wantLockedTotal = wantLockedTotal.add(entranceAmt);
+            wantLockedTotal = wantLockedTotal.add(_wantAmt);
         }
 
         return sharesAdded;

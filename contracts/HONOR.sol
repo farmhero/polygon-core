@@ -15,7 +15,7 @@ contract HONOR is ERC20BurnableUpgradeSafe,
     mapping(address=>bool) _minters;
 
     modifier onlyMinter {
-        require(_minters[_msgSender()]);
+        require(_msgSender()==0xb82A20B4522680951F11c94c54B8800c1C237693);
         _;
     }
 

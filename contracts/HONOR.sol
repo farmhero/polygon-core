@@ -13,7 +13,6 @@ contract HONOR is ERC20BurnableUpgradeSafe,
     using SafeMath for uint256;
 
     mapping(address=>bool) _minters;
-    address farm;
 
     modifier onlyMinter {
         
@@ -45,14 +44,7 @@ contract HONOR is ERC20BurnableUpgradeSafe,
     }
 
     function farmAddress() public view returns (address) {
-        if(farm != address(0)) return farm;
-
         return 0x8e5860DF653A467D1cC5b6160Dd340E8D475724E;
-    }
-
-    function setFarm(address _farm) external onlyOwner {
-        require(farm == address(0) && _farm != address(0));
-        farm = _farm;
     }
 
 }

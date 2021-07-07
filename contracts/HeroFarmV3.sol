@@ -3,7 +3,6 @@
 pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 
-import "hardhat/console.sol";
 import "./lib.sol";
 import "./IERC721.sol";
 import "./interfaces.sol";
@@ -895,15 +894,15 @@ contract HeroFarmV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableU
         );
     }
 
-    function setFeeExclude(address _user, bool _feeExclude) external onlyOwner {
+    function setFeeExclude(address _user) external onlyOwner {
         require(_user != address(0));
-        feeExclude[_user] = _feeExclude;
-        emit FeeExclude(_user, _feeExclude);
+        feeExclude[_user] = true;
+        emit FeeExclude(_user, true);
     }
 
-    function setSkipEOA(address _user, bool _skip) external onlyOwner {
+    function setSkipEOA(address _user) external onlyOwner {
         require(_user != address(0));
-        skipEOA[_user] = _skip;
-        emit SkipEOA(_user, _skip);
+        skipEOA[_user] = true;
+        emit SkipEOA(_user, true);
     }
 }

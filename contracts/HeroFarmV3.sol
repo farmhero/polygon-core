@@ -188,9 +188,7 @@ contract HeroFarmV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableU
         uint256 _allocPoint,
         bool _withUpdate
     ) public onlyOwner nonReentrant {
-        if (_withUpdate) {
-            massUpdatePools();
-        }
+        massUpdatePools();
         totalAllocPoint[poolInfo[_pid].poolType] = totalAllocPoint[poolInfo[_pid].poolType].sub(poolInfo[_pid].allocPoint).add(
             _allocPoint
         );
@@ -644,7 +642,7 @@ contract HeroFarmV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableU
             if (wantBal < _wantAmt) {
                 _wantAmt = wantBal;
             }
-            if(withdrawFee || !feeExclude[msg.sender]) {
+            if(withdrawFee && !feeExclude[msg.sender]) {
                 uint256 feeRate = _calcFeeRateByGracePeriod(uint256(user.gracePeriod));
                 if(feeRate > 0){
                     uint256 feeAmount = _wantAmt.mul(feeRate).div(10000);
@@ -779,9 +777,10 @@ contract HeroFarmV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableU
         }
 
         emit EmergencyWithdrawNFT(msg.sender, _pid, _tokenIds);
-        user.shares = 0;
-        user.rewardDebt = 0;
-        user.gracePeriod = 0;
+        // user.shares = 0;
+        user.rewardDebt = user.shares.mul(pool.accHEROPerShare).div(1e12);
+        if(user.shares == 0)
+            user.gracePeriod = 0;
     }
 
     // Safe HERO transfer function, just in case if rounding error causes pool to not have enough
@@ -881,6 +880,7 @@ contract HeroFarmV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableU
     }
 
     function setRates(uint256 _teamRate, uint256 _communityRate, uint256 _ecosystemRate, uint256 _reservedNFTFarmingRate) external onlyOwner {
+        require(_teamRate.add(_communityRate).add(_ecosystemRate).add(_reservedNFTFarmingRate) == 650);
         teamRate = _teamRate;
         communityRate = _communityRate;
         ecosystemRate = _ecosystemRate;

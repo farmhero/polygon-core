@@ -395,9 +395,8 @@ contract Playerbook {
         uint256 reward = ReferralReward[msg.sender];
         require(rewardToken.balanceOf(address(this)) >= reward);
 
-        rewardToken.transfer(msg.sender, reward);
-
         ReferralReward[msg.sender] = 0;
+        rewardToken.transfer(msg.sender, reward);
 
         return true;
     }

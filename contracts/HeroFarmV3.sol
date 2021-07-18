@@ -797,8 +797,9 @@ contract HeroFarmV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableU
         public
         onlyOwner
     {
-        require(_token != HERO, "!safe");
-        IERC20(_token).safeTransfer(msg.sender, _amount);
+        // this function is obsolete and can't be called.
+        // require(_token != HERO, "!safe");
+        // IERC20(_token).safeTransfer(msg.sender, _amount);
     }
 
     function pause() external onlyOwner {
